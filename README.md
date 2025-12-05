@@ -1,7 +1,7 @@
 # Planetscope-General-Workflow
 A generalized workflow for ordering, processing, and generating scatterplots and time-series outputs for an area-of-interest (AOI). This project is focused on Planetscope surface reflectance (SR), orthorectified product.
 
-<b>Step 1: Order & Download Planetscope scenes using the Planet API </b>
+<b>Order & Download Planetscope scenes using the Planet API (00 - Order from Planet API.R)</b>
 
   The script for calling the Planet API requires an API key, which can be found under the user's Planet account profile under "My Settings". Anyone can create
   a Planet account, but to have download access to Planetscope 8-band imagery one must apply to the Commercial Satellite Data Acquisition (CSDA) program. The quota for CSDA accounts is 
@@ -19,6 +19,19 @@ A generalized workflow for ordering, processing, and generating scatterplots and
     (2) usable data mask (udm) file. The latest UDM version (version 2.1) contains eight mask layers. Mask file names ending with "udm2.tif" or "udm2_clip.tif".<br>
     (3) metadata file, with file name ending with "metadata.json".<br>
     (4) XML file containing order information and coefficient for converting digital number (DN) values to top-of-atmosphere (TOA) reflectance values.<br>
+
+<b>Prepare Spatial Data for Extrations (01 - Data.R)</b><br>
+
+A few things to bear in mind when preparing your spatial data for extractions using the exactextractr::exact_extract function are that (1) it is an sf, sfc, or SpatialPolygonsDataFrame object; (2) it's projected in UTM and it corresponds to the image you're extracting from; (3) does not contain empty polygons. <br>
+
+This script also reads in metadata for Planet imagery and prepares a summary that can be used for making proper data selection.<br><br>.
+
+<b>Extractions (02 -Extraction Loop.R)</b><br>
+
+The objective of this script is to iterate through a list of Planetscope files and compile extractions of median values from polygons. If the objective is to extract by points, this can be adjusted by replacing with the function exactextractr::exact_extract with terra::extract and turning the sf object into a SpatVector object by using terra::vect(). <br>
+
+The masking process within this loop uses two layers from the udm file (usable data mask), namely "clear" (0 = not clear and 1 = clear) and "clear_confidence_percent" (an integer from 0-100).  Through previous observations, we've found that constricting the use of imagery having a clear confidence percentage of >= 90 provides the most reliable results.<br><br>
+
 
 <b>Links:</b><br>
   Planet Labs https://www.planet.com/ <br>
